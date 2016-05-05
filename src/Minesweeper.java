@@ -31,7 +31,7 @@ public class Minesweeper extends JFrame implements Runnable{
         ImageIcon HIDDEN = new ImageIcon("img/hidden.png");
         ImageIcon HIDDEN_PRESSED = new ImageIcon("img/phidden.png");
         //Define Segment Display
-
+        ImageIcon SEG7 = new ImageIcon("img/SEG_7_SCALED.png");
         //Define GUI Components
 		JMenuBar menuBar = new JMenuBar();
         JMenu gameMenu = new JMenu("Game");
@@ -39,11 +39,21 @@ public class Minesweeper extends JFrame implements Runnable{
         JMenuItem exitItem = new JMenuItem("Exit");
         JPanel gamePanel = new JPanel();
         JPanel displayPanel = new JPanel();
-        //Add displays to display panel
-        JPanel mineDisplayPanel = new JPanel();
+        JPanel mineDisplayPanel = new JPanel(){
+            protected void paintComponent(Graphics g){
+                g.drawImage(SEG7.getImage(), 0, 0, null);
+            }
+        };
         JPanel timeDisplayPanel = new JPanel();
-        mineDisplayPanel.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        timeDisplayPanel.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        //Add displays to display panel
+        displayPanel.setLayout(new BorderLayout());
+        mineDisplayPanel.setLayout(new BoxLayout(mineDisplayPanel, BoxLayout.X_AXIS));
+        timeDisplayPanel.setLayout(new BoxLayout(timeDisplayPanel, BoxLayout.X_AXIS));
+        displayPanel.add(mineDisplayPanel, BorderLayout.WEST);
+        displayPanel.add(timeDisplayPanel, BorderLayout.EAST);
+        //DEBUG
+
+
         //Add display and game to GUI
         this.setLayout(new BorderLayout());
         this.add(gamePanel, BorderLayout.CENTER);
@@ -55,6 +65,9 @@ public class Minesweeper extends JFrame implements Runnable{
         gameMenu.addSeparator();
         gameMenu.add(exitItem);
         //Add actions to menu items
+        this.add(gameMenu);
+        this.add(displayPanel);
+        this.add(gamePanel);
         newItem.addActionListener((ActionEvent actionEvent) -> {
             try {
                 DifficultyDialog difficultyDialog = new DifficultyDialog(this);
