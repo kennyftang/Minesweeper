@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class SizeDialog extends JFrame {
@@ -8,26 +9,33 @@ public class SizeDialog extends JFrame {
         JPanel xInput = new JPanel();
         JPanel yInput = new JPanel();
         JPanel minesInput = new JPanel();
+        JPanel inputs = new JPanel();
         JTextField xField = new JTextField();
         JTextField yField = new JTextField();
         JTextField minesField = new JTextField();
         JLabel xLabel = new JLabel("Width:");
         JLabel yLabel = new JLabel("Height:");
         JLabel minesLabel = new JLabel("Mines:");
-        xInput.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        yInput.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        minesInput.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+        xInput.setLayout(new BoxLayout(xInput, BoxLayout.X_AXIS));
+        yInput.setLayout(new BoxLayout(yInput, BoxLayout.X_AXIS));
+        minesInput.setLayout(new BoxLayout(minesInput, BoxLayout.X_AXIS));
+        inputs.setLayout(new BoxLayout(inputs, BoxLayout.Y_AXIS));
+        xField.setMaximumSize(new Dimension(50, 20));
+        yField.setMaximumSize(new Dimension(50, 20));
+        minesField.setMaximumSize(new Dimension(50, 20));
         xInput.add(xLabel);
         xInput.add(xField);
-        xInput.add(yLabel);
-        xInput.add(yField);
-        xInput.add(minesLabel);
-        xInput.add(minesField);
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.add(xInput);
-        this.add(yInput);
-        this.add(minesInput);
-        this.add(okButton);
+        yInput.add(yLabel);
+        yInput.add(yField);
+        minesInput.add(minesLabel);
+        minesInput.add(minesField);
+//        this.setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
+        this.setLayout(new BorderLayout());
+        inputs.add(xInput);
+        inputs.add(yInput);
+        inputs.add(minesInput);
+        this.add(inputs, BorderLayout.CENTER);
+        this.add(okButton, BorderLayout.SOUTH);
         okButton.addActionListener((ActionEvent actionEvent) -> {
             try {
                 int xVal = Integer.valueOf(xField.getText());
@@ -46,10 +54,9 @@ public class SizeDialog extends JFrame {
                     return;
                 }
                 gameState.setMap(xVal, yVal, minesVal);
+                difficultyDialog.dispose();
             } catch (NumberFormatException e){}
-            difficultyDialog.notify();
             this.dispose();
         });
-        difficultyDialog.setSize(400, 100);
     }
 }
