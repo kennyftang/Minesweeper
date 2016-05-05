@@ -1,42 +1,38 @@
 import javax.swing.*;
 import javax.swing.border.BevelBorder;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
 
 public class Minesweeper extends JFrame implements Runnable{
-    private GameState gameState;
-    private JPanel gamePanel;
+    private final GameState gameState;
+    private final JPanel gamePanel;
     //Define Minesweeper Icons
-    ImageIcon ONE_ADJ = new ImageIcon("img/1.png");
-    ImageIcon TWO_ADJ = new ImageIcon("img/2.png");
-    ImageIcon THREE_ADJ = new ImageIcon("img/3.png");
-    ImageIcon FOUR_ADJ = new ImageIcon("img/4.png");
-    ImageIcon FIVE_ADJ = new ImageIcon("img/5.png");
-    ImageIcon SIX_ADJ = new ImageIcon("img/6.png");
-    ImageIcon SEVEN_ADJ = new ImageIcon("img/7.png");
-    ImageIcon EIGHT_ADJ = new ImageIcon("img/8.png");
-    ImageIcon BLANK = new ImageIcon("img/blank.png");
-    ImageIcon FLAG = new ImageIcon("img/flag.png");
-    ImageIcon MINE = new ImageIcon("img/mine.png");
-    ImageIcon HIDDEN = new ImageIcon("img/hidden.png");
-    ImageIcon HIDDENNB = new ImageIcon("img/hiddennb.png");
-    ImageIcon HIDDEN_PRESSED = new ImageIcon("img/phidden.png");
+    private final ImageIcon ONE_ADJ = new ImageIcon("img/1.png");
+    private final ImageIcon TWO_ADJ = new ImageIcon("img/2.png");
+    private final ImageIcon THREE_ADJ = new ImageIcon("img/3.png");
+    private final ImageIcon FOUR_ADJ = new ImageIcon("img/4.png");
+    private final ImageIcon FIVE_ADJ = new ImageIcon("img/5.png");
+    private final ImageIcon SIX_ADJ = new ImageIcon("img/6.png");
+    private final ImageIcon SEVEN_ADJ = new ImageIcon("img/7.png");
+    private final ImageIcon EIGHT_ADJ = new ImageIcon("img/8.png");
+    private final ImageIcon BLANK = new ImageIcon("img/blank.png");
+    private final ImageIcon FLAG = new ImageIcon("img/flag.png");
+    private final ImageIcon MINE = new ImageIcon("img/mine.png");
+    private final ImageIcon HIDDEN = new ImageIcon("img/hidden.png");
+    private final ImageIcon HIDDEN_PRESSED = new ImageIcon("img/phidden.png");
     //Define Segment Icons
-    ImageIcon SEG0 = new ImageIcon("img/SEG_0.png");
-    ImageIcon SEG1 = new ImageIcon("img/SEG_1.png");
-    ImageIcon SEG2 = new ImageIcon("img/SEG_2.png");
-    ImageIcon SEG3 = new ImageIcon("img/SEG_3.png");
-    ImageIcon SEG4 = new ImageIcon("img/SEG_4.png");
-    ImageIcon SEG5 = new ImageIcon("img/SEG_5.png");
-    ImageIcon SEG6 = new ImageIcon("img/SEG_6.png");
-    ImageIcon SEG7 = new ImageIcon("img/SEG_7.png");
-    ImageIcon SEG8 = new ImageIcon("img/SEG_8.png");
-    ImageIcon SEG9 = new ImageIcon("img/SEG_9.png");
+    private final ImageIcon SEG0 = new ImageIcon("img/SEG_0.png");
+    private final ImageIcon SEG1 = new ImageIcon("img/SEG_1.png");
+    private final ImageIcon SEG2 = new ImageIcon("img/SEG_2.png");
+    private final ImageIcon SEG3 = new ImageIcon("img/SEG_3.png");
+    private final ImageIcon SEG4 = new ImageIcon("img/SEG_4.png");
+    private final ImageIcon SEG5 = new ImageIcon("img/SEG_5.png");
+    private final ImageIcon SEG6 = new ImageIcon("img/SEG_6.png");
+    private final ImageIcon SEG7 = new ImageIcon("img/SEG_7.png");
+    private final ImageIcon SEG8 = new ImageIcon("img/SEG_8.png");
+    private final ImageIcon SEG9 = new ImageIcon("img/SEG_9.png");
     //Runner
 	public static void main(String[] args){
 		Minesweeper client = new Minesweeper();
@@ -100,9 +96,7 @@ public class Minesweeper extends JFrame implements Runnable{
             difficultyDialog.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             difficultyDialog.setVisible(true);
         });
-        exitItem.addActionListener((ActionEvent actionEvent) -> {
-            System.exit(0);
-        });
+        exitItem.addActionListener((ActionEvent actionEvent) -> System.exit(0));
 
         //Game Start
         gamePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

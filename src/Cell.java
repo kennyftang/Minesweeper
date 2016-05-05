@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class Cell extends JLabel {
-    private Point cellLocation;
+    private final Point cellLocation;
     private int cellType;
     public Cell(Point cellLocation){
         super();

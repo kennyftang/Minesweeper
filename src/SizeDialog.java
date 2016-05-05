@@ -47,16 +47,16 @@ public class SizeDialog extends JFrame {
                     error.add(new JLabel("Error: Invalid Size"));
                     JButton okButtonD = new JButton("OK");
                     error.add(okButtonD);
-                    okButtonD.addActionListener((ActionEvent actionEvent2) -> {
-                        this.dispose();
-                    });
+                    okButtonD.addActionListener((ActionEvent actionEvent2) -> this.dispose());
                     error.setVisible(true);
                     return;
                 }
                 gameState.setMap(xVal, yVal, minesVal);
                 difficultyDialog.dispose();
-            } catch (NumberFormatException e){}
-            this.dispose();
+                this.dispose();
+            } catch (NumberFormatException e){
+                this.dispose();
+            }
         });
     }
 }
