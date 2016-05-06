@@ -139,21 +139,38 @@ public class Minesweeper extends JFrame{
             return false;
         if(cellX > 0)
             minesAdjacent = discoverAround(map[cellY][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
+        if(minesAdj > 0)
+            return false;
         if(cellY > 0)
             minesAdjacent = discoverAround(map[cellY - 1][cellX], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
+        if(minesAdj > 0)
+            return false;
         if(cellX < x)
             minesAdjacent = discoverAround(map[cellY][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
+        if(minesAdj > 0)
+            return false;
         if(cellY < y)
             minesAdjacent = discoverAround(map[cellY + 1][cellX], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
+        if(minesAdj > 0)
+            return false;
         if(cellX < x && cellY < y)
             minesAdjacent = discoverAround(map[cellY + 1][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
+        if(minesAdj > 0)
+            return false;
         if(cellX > 0 && cellY < y)
             minesAdjacent = discoverAround(map[cellY + 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
+        if(minesAdj > 0)
+            return false;
         if(cellX < x && cellY > 0)
             minesAdjacent = discoverAround(map[cellY - 1][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
+        if(minesAdj > 0)
+            return false;
         if(cellX > 0 && cellY > 0)
             minesAdjacent = discoverAround(map[cellY - 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
+        if(minesAdj > 0)
+            return false;
         origin.setIcon(adjIconFromInt(minesAdjacent));
+        origin.setCellType(minesAdjacent == 0 ? 0 : minesAdjacent + 3);
         return false;
     }
     private void initializeMap(){
@@ -167,27 +184,32 @@ public class Minesweeper extends JFrame{
                 MouseListener cellMouseListener = new MouseListener() {
                     private boolean inCell = false;
                     private boolean flagged = false;
+                    private boolean skipCheck = false;
                     public void mouseClicked(MouseEvent e) {}
                     @Override
                     public void mousePressed(MouseEvent e) {
-                        if(e.getButton() == MouseEvent.BUTTON3) {
+                        if(e.getButton() == MouseEvent.BUTTON3 && ((Cell)e.getSource()).getCellType() != Cell.BLANK && !(((Cell)e.getSource()).getCellType() >= Cell.ONE)) {
                             flagged = !flagged;
                             if(flagged)
                                 ((Cell)e.getSource()).setIcon(FLAG);
-                            else
+                            else {
+                                skipCheck = true;
                                 ((Cell)e.getSource()).setIcon(HIDDEN);
+                            }
                         }
-                        else if(!flagged)
+                        else if(!flagged && ((Cell)e.getSource()).getCellType() != Cell.BLANK && !(((Cell)e.getSource()).getCellType() >= Cell.ONE)) {
+                            skipCheck = false;
                             ((Cell)e.getSource()).setIcon(HIDDEN_PRESSED);
+                        }
                     }
 
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         if(!gameState.isGameRunning())
-                            startGame();
-                        if(inCell && !flagged){
+                            startGame(((Cell)e.getSource()).getCellLocation());
+                        if(inCell && !flagged & !skipCheck){
                             checkCell(((Cell)e.getSource()));
-                        } else if(!flagged)
+                        } else if(!flagged && ((Cell)e.getSource()).getCellType() != Cell.BLANK && !(((Cell)e.getSource()).getCellType() >= Cell.ONE))
                             ((Cell)e.getSource()).setIcon(HIDDEN);
                     }
 
@@ -221,7 +243,7 @@ public class Minesweeper extends JFrame{
             discoverAround(cell, new HashSet<>(), 0);
         }
     }
-    public void startGame(){
+    private void startGame(Point startCell){
         if(!gameTimer.isRunning())
             gameTimer.start();
         gameState.setGameRunning(true);
