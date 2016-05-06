@@ -1,13 +1,13 @@
-public class GameState {
+class GameState {
     private Cell[][] map;
     private int mines;
     private boolean gameRunning;
-    public GameState(){
+    GameState(){
         map = new Cell[8][8];
         this.mines = 10;
         this.gameRunning = false;
     }
-    public int getMines() {
+    int getMines() {
         return mines;
     }
 
@@ -23,12 +23,12 @@ public class GameState {
         this.gameRunning = gameRunning;
     }
 
-    public void setMap(int x, int y, int mines){
+    void setMap(int x, int y, int mines){
         this.mines = mines;
         map = new Cell[x][y];
     }
 
-    public Cell[][] getMap(){
+    Cell[][] getMap(){
         return map;
     }
 }

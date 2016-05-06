@@ -2,8 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class SizeDialog extends JFrame {
-    public SizeDialog(DifficultyDialog difficultyDialog, GameState gameState) {
+class SizeDialog extends JFrame {
+    SizeDialog(DifficultyDialog difficultyDialog, GameState gameState) {
         //Adds 3 inputs for width, height, and number of mines and a OK button
         JButton okButton = new JButton("OK");
         JPanel xInput = new JPanel();

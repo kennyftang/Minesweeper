@@ -1,8 +1,8 @@
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class DifficultyDialog extends JFrame {
-    public DifficultyDialog(Minesweeper client){
+class DifficultyDialog extends JFrame {
+    DifficultyDialog(Minesweeper client){
         JButton beginnerButton = new JButton("Beginner");
         JButton intermediateButton = new JButton("Intermediate");
         JButton expertButton = new JButton("Expert");
