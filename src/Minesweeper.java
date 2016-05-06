@@ -218,7 +218,7 @@ public class Minesweeper extends JFrame{
             }
             cell.setIcon(MINE_LOSE);
         } else if(cell.getCellType() == Cell.HIDDEN){
-            discoverAround(cell, new HashSet<Cell>(), 0);
+            discoverAround(cell, new HashSet<>(), 0);
         }
     }
     public void startGame(){
@@ -232,6 +232,7 @@ public class Minesweeper extends JFrame{
         for(int i = 0; i < gameState.getMines(); i++) {
             int mine = mineRandomSpread.remove((int)(Math.random() * mineRandomSpread.size()));
             gameState.getMap()[mine / gameState.getMap().length][mine % gameState.getMap().length].setCellType(Cell.MINE);
+            mineCells.add(gameState.getMap()[mine / gameState.getMap().length][mine % gameState.getMap().length]);
         }
     }
     GameState getGameState(){
