@@ -9,14 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Minesweeper extends JFrame{
-    private GameState gameState;
-    private JLabel mineLabel1;
-    private JLabel mineLabel2;
-    private JLabel mineLabel3;
-    private JLabel timerLabel1;
-    private JLabel timerLabel2;
-    private JLabel timerLabel3;
+public class Minesweeper extends JFrame {
     //Define Minesweeper Icons
     private final ImageIcon ONE_ADJ = new ImageIcon("img/1.png");
     private final ImageIcon TWO_ADJ = new ImageIcon("img/2.png");
@@ -43,26 +36,25 @@ public class Minesweeper extends JFrame{
     private final ImageIcon SEG7 = new ImageIcon("img/SEG_7.png");
     private final ImageIcon SEG8 = new ImageIcon("img/SEG_8.png");
     private final ImageIcon SEG9 = new ImageIcon("img/SEG_9.png");
+    private final GameState gameState;
+    private final JLabel mineLabel1;
+    private final JLabel mineLabel2;
+    private final JLabel mineLabel3;
+    private final JLabel timerLabel1;
+    private final JLabel timerLabel2;
+    private final JLabel timerLabel3;
     //Instance Variables
+    private int mineCount;
     private int timerTime;
-    private Timer gameTimer;
+    private final Timer gameTimer;
     private Set<Cell> mineCells;
     private JPanel oldGamePanel;
 
-    //Runner
-	public static void main(String[] args){
-		Minesweeper client = new Minesweeper();
-        client.setSize(400, 500);
-        client.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        client.setVisible(true);
-        client.pack();
-	}
-
     //Game Logic
-	private Minesweeper(){
+    private Minesweeper() {
         gameState = new GameState(this);
         //Define GUI Components
-		JMenuBar menuBar = new JMenuBar();
+        JMenuBar menuBar = new JMenuBar();
         JMenu gameMenu = new JMenu("Game");
         JMenuItem newItem = new JMenuItem("New");
         JMenuItem exitItem = new JMenuItem("Exit");
@@ -71,8 +63,8 @@ public class Minesweeper extends JFrame{
         JPanel timeDisplayPanel = new JPanel();
         //Define and Add JLabels for time and mines
         //Makes the time and mine display look nicer :)
-        mineDisplayPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5) ,BorderFactory.createBevelBorder(BevelBorder.RAISED)));
-        timeDisplayPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5) ,BorderFactory.createBevelBorder(BevelBorder.RAISED)));
+        mineDisplayPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), BorderFactory.createBevelBorder(BevelBorder.RAISED)));
+        timeDisplayPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5), BorderFactory.createBevelBorder(BevelBorder.RAISED)));
         //Starts mines at 10 (beginner level)
         mineLabel1 = new JLabel(SEG0);
         mineLabel2 = new JLabel(SEG1);
@@ -115,105 +107,75 @@ public class Minesweeper extends JFrame{
 
         //Game Start
         timerTime = 0;
-        gameTimer = new Timer(1000, (ActionEvent actionEvent) -> incTime());
+        gameTimer = new Timer(1000, (ActionEvent actionEvent) -> incTime(1));
         initializeMap();
 
     }
-    private boolean mapMap(Cell origin, Set<Cell> visited, int minesAdj){
 
+    //Runner
+    public static void main(String[] args) {
+        Minesweeper client = new Minesweeper();
+        client.setSize(400, 500);
+        client.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        client.setVisible(true);
+        client.pack();
+    }
+
+    private void mapMap() {
         Cell[][] map = gameState.getMap();
-        int x = map.length;
-        int y = map[0].length;
-        /*
-        int cellX = origin.getCellLocation().x;
-        int cellY = origin.getCellLocation().y;
-        int minesAdjacent = 0;
-        if(origin.getCellType() == Cell.MINE) {
-            return true;
-        }
-        if(!visited.add(origin))
-            return false;
-        if(cellX > 0)
-            minesAdjacent = mapMap(map[cellY][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(cellY > 0)
-            minesAdjacent = mapMap(map[cellY - 1][cellX], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(cellX < x)
-            minesAdjacent = mapMap(map[cellY][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(cellY < y)
-            minesAdjacent = mapMap(map[cellY + 1][cellX], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(cellX < x && cellY < y)
-            minesAdjacent = mapMap(map[cellY + 1][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(cellX > 0 && cellY < y)
-            minesAdjacent = mapMap(map[cellY + 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(cellX < x && cellY > 0)
-            minesAdjacent = mapMap(map[cellY - 1][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(cellX > 0 && cellY > 0)
-            minesAdjacent = mapMap(map[cellY - 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        origin.setCellType(minesAdjacent == 0 ? 0 : minesAdjacent + 3);
-        return false;*/
-        for(int i = 0; i < x; i++){
-            for(int j = 0; j < y; j++){
+        for (Cell[] cellRow : map) {
+            for (Cell curCell : cellRow) {
+                if (curCell.getHiddenType() == Cell.MINE)
+                    continue;
                 int minesAdjacent = 0;
-                if(i > 0)
-                    if(map[i - 1][j].getCellType() > 3)
+                for (Cell adj : curCell.getAdjacentCells(map)) {
+                    if (adj.getHiddenType() == Cell.MINE)
                         minesAdjacent++;
-                if(j > 0)
-                    if(map[i][j - 1].getCellType() > 3)
-                        minesAdjacent++;
-                if(i < map.length)
-                    if(map[i + 1][j].getCellType() > 3)
-                        minesAdjacent++;
-                if(j > map[i].length)
-                    if(map[i][j + 1].getCellType() > 3)
-                        minesAdjacent++;
-                if(i > 0 && j < map[0].length)
-                    if(map[i - 1][j + 1].getCellType() > 3)
-                        minesAdjacent++;
-                if(j > 0 && i < map.length) //TODO ended here
-                    if(map[i][j].getCellType() > 3)
-                        minesAdjacent++;
-                if(i > 0)
-                    if(map[i][j].getCellType() > 3)
-                        minesAdjacent++;
-                if(i > 0)
-                    if(map[i][j].getCellType() > 3)
-                        minesAdjacent++;
-                if(i > 0)
-                    if(map[i][j].getCellType() > 3)
-                        minesAdjacent++;
+                }
+                curCell.setHiddenType(minesAdjacent);
             }
         }
     }
-    void initializeMap(){
+
+    /*
+    This method is run in order to prepare the gamePanel for a new game.
+    The current gamePanel will be replaced with a new gamePanel every time it is called.
+
+     */
+    void initializeMap() {
         JPanel gamePanel = new JPanel();
         gamePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
         Cell[][] map = gameState.getMap();
         mineCells = new HashSet<>();
-        for(int i = 0; i < map.length; i++){
+        for (int i = 0; i < map.length; i++) {
+            //Instantiates a new row for the game panel with a box layout so adding will add cells horizontally.
             JPanel cellRow = new JPanel();
             cellRow.setLayout(new BoxLayout(cellRow, BoxLayout.X_AXIS));
-            for(int j = 0; j < map[i].length; j++){
+            for (int j = 0; j < map[i].length; j++) {
                 map[i][j] = new Cell(new Point(j, i));
                 MouseListener cellMouseListener = new MouseListener() {
                     private boolean inCell = false;
                     private boolean flagged = false;
-                    private boolean skipCheck = false;
-                    public void mouseClicked(MouseEvent e) {}
+                    private boolean skipCheck = false; // if right click
+
+                    public void mouseClicked(MouseEvent e) {
+                    }
+
                     @Override
                     public void mousePressed(MouseEvent e) {
-                        if(e.getButton() == MouseEvent.BUTTON3 && ((Cell)e.getSource()).getCellType() != Cell.BLANK && !(((Cell)e.getSource()).getCellType() >= Cell.ONE)) {
+                        //If right click, cell is hidden or a flag
+                        if (e.getButton() == MouseEvent.BUTTON3 && (((Cell)e.getSource()).getCellType() == Cell.HIDDEN || ((Cell)e.getSource()).getCellType() == Cell.FLAG)) {
                             flagged = !flagged;
-                            if(flagged) {
+                            if (flagged) {
                                 ((Cell)e.getSource()).setIcon(FLAG);
                                 ((Cell)e.getSource()).setCellType(Cell.FLAG);
-                            }
-                            else {
+                            } else {
                                 skipCheck = true;
                                 ((Cell)e.getSource()).setIcon(HIDDEN);
+                                ((Cell)e.getSource()).setCellType(Cell.HIDDEN);
                             }
-                        }
-                        else if(!flagged && ((Cell)e.getSource()).getCellType() != Cell.BLANK && !(((Cell)e.getSource()).getCellType() >= Cell.ONE)) {
+                        } else if (!flagged && ((Cell)e.getSource()).getCellType() == Cell.HIDDEN) {
                             skipCheck = false;
                             ((Cell)e.getSource()).setIcon(HIDDEN_PRESSED);
                         }
@@ -221,12 +183,10 @@ public class Minesweeper extends JFrame{
 
                     @Override
                     public void mouseReleased(MouseEvent e) {
-                        if(!gameState.isGameRunning())
+                        if (!gameState.isGameRunning())
                             startGame(((Cell)e.getSource()).getCellLocation());
-                        if(inCell && !flagged & !skipCheck){
+                        if (inCell && !flagged & !skipCheck)
                             checkCell(((Cell)e.getSource()));
-                        } else if(!flagged && ((Cell)e.getSource()).getCellType() != Cell.BLANK && !(((Cell)e.getSource()).getCellType() >= Cell.ONE))
-                            ((Cell)e.getSource()).setIcon(HIDDEN);
                     }
 
                     @Override
@@ -241,59 +201,86 @@ public class Minesweeper extends JFrame{
                 };
                 map[i][j].addMouseListener(cellMouseListener);
                 cellRow.add(map[i][j]);
+                if (gameTimer != null) {
+                    gameTimer.stop();
+                    timerTime = 0;
+                    incTime(0);
+                }
             }
             gamePanel.add(cellRow);
         }
-        int numMines = gameState.getMines();
-        mineLabel1.setIcon(timerIconFromInt(numMines/100));
-        mineLabel2.setIcon(timerIconFromInt((numMines%100)/10));
-        mineLabel3.setIcon(timerIconFromInt(numMines%10));
-        if(oldGamePanel != null)
+        mineCount = gameState.getMines();
+        incMines(0);
+        if (oldGamePanel != null)
             this.remove(oldGamePanel);
         oldGamePanel = gamePanel;
         this.add(gamePanel, BorderLayout.CENTER);
         this.pack();
     }
+
+    private void revealCell(Cell cell) {
+        if (adjIconFromInt(cell.getHiddenType()) != null) {
+            cell.setIcon(adjIconFromInt(cell.getHiddenType()));
+            cell.setCellType(cell.getHiddenType());
+        }
+    }
+
     //TODO Make a discover method
-    private void checkCell(Cell cell){
-        if(cell.getCellType() == Cell.MINE){
-            for(Cell mines : mineCells){
+    private void checkCell(Cell cell) {
+        if (cell.getHiddenType() == Cell.MINE) {
+            //TODO Lose Game Implementation
+            for (Cell mines : mineCells) {
                 mines.setIcon(MINE);
             }
             cell.setIcon(MINE_LOSE);
-        } else if(cell.getCellType() == Cell.HIDDEN){
-            //Discover Here
+        } else if (cell.getCellType() == Cell.HIDDEN) {
+            //TODO Add working discover method here
+            for (Cell[] cellRow : gameState.getMap())
+                for (Cell curCell : cellRow)
+                    revealCell(curCell);
         }
     }
-    private void startGame(Point startCell){
-        if(!gameTimer.isRunning())
+
+    private void startGame(Point startCell) {
+        //TODO No mines within 1 radius
+        if (!gameTimer.isRunning())
             gameTimer.start();
+        Cell[][] map = gameState.getMap();
         gameState.setGameRunning(true);
-        while(true) {
-            ArrayList<Integer> mineRandomSpread = new ArrayList<>();
-            for (int i = 0; i < gameState.getMap().length * gameState.getMap()[0].length; i++)
-                mineRandomSpread.add(i);
-            Collections.shuffle(mineRandomSpread);
-            for (int i = 0; i < gameState.getMines(); i++) {
-                int mine = mineRandomSpread.remove((int)(Math.random() * mineRandomSpread.size()));
-                gameState.getMap()[mine / gameState.getMap().length][mine % gameState.getMap().length].setCellType(Cell.MINE);
-                mineCells.add(gameState.getMap()[mine / gameState.getMap().length][mine % gameState.getMap().length]);
-                if (!mapMap(gameState.getMap()[startCell.x][startCell.y], new HashSet<>(), 0))
-                    return;
-            }
+        ArrayList<Integer> mineRandomSpread = new ArrayList<>();
+        for (int i = 0; i < map.length * map[0].length; i++)
+            mineRandomSpread.add(i);
+        Collections.shuffle(mineRandomSpread);
+        for (int i = 0; i < gameState.getMines(); i++) {
+            int mine = mineRandomSpread.remove((int)(Math.random() * mineRandomSpread.size()));
+            Cell randCell = map[mine / map.length][mine % map.length];
+            randCell.setCellType(Cell.HIDDEN);
+            randCell.setHiddenType(Cell.MINE);
+            mineCells.add(randCell);
         }
+        mapMap();
     }
-    GameState getGameState(){
+
+    GameState getGameState() {
         return gameState;
     }
-    private void incTime(){
-        timerTime++;
-        timerLabel1.setIcon(timerIconFromInt(timerTime/100));
-        timerLabel2.setIcon(timerIconFromInt((timerTime%100)/10));
-        timerLabel3.setIcon(timerIconFromInt(timerTime%10));
+
+    private void incTime(int amt) {
+        timerTime += amt;
+        timerLabel1.setIcon(timerIconFromInt(timerTime / 100));
+        timerLabel2.setIcon(timerIconFromInt((timerTime % 100) / 10));
+        timerLabel3.setIcon(timerIconFromInt(timerTime % 10));
     }
-    private Icon timerIconFromInt(int num){
-        switch(num){
+
+    private void incMines(int amt) {
+        mineCount += amt;
+        mineLabel1.setIcon(timerIconFromInt(mineCount / 100));
+        mineLabel2.setIcon(timerIconFromInt((mineCount % 100) / 10));
+        mineLabel3.setIcon(timerIconFromInt(mineCount % 10));
+    }
+
+    private Icon timerIconFromInt(int num) {
+        switch (num) {
             case 0:
                 return SEG0;
             case 1:
@@ -318,7 +305,8 @@ public class Minesweeper extends JFrame{
                 return null;
         }
     }
-    private Icon adjIconFromInt(int num){
+
+    private Icon adjIconFromInt(int num) {
         switch (num) {
             case 0:
                 return BLANK;
