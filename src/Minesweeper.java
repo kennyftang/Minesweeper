@@ -11,7 +11,6 @@ import java.util.Set;
 
 public class Minesweeper extends JFrame{
     private GameState gameState;
-    private JPanel gamePanel;
     private JLabel mineLabel1;
     private JLabel mineLabel2;
     private JLabel mineLabel3;
@@ -48,6 +47,7 @@ public class Minesweeper extends JFrame{
     private int timerTime;
     private Timer gameTimer;
     private Set<Cell> mineCells;
+    private JPanel oldGamePanel;
 
     //Runner
 	public static void main(String[] args){
@@ -60,13 +60,12 @@ public class Minesweeper extends JFrame{
 
     //Game Logic
 	private Minesweeper(){
-        gameState = new GameState();
+        gameState = new GameState(this);
         //Define GUI Components
 		JMenuBar menuBar = new JMenuBar();
         JMenu gameMenu = new JMenu("Game");
         JMenuItem newItem = new JMenuItem("New");
         JMenuItem exitItem = new JMenuItem("Exit");
-        gamePanel = new JPanel();
         JPanel displayPanel = new JPanel();
         JPanel mineDisplayPanel = new JPanel();
         JPanel timeDisplayPanel = new JPanel();
@@ -97,7 +96,6 @@ public class Minesweeper extends JFrame{
         //Add display and game to GUI
         this.setLayout(new BorderLayout());
         this.setJMenuBar(menuBar);
-        this.add(gamePanel, BorderLayout.CENTER);
         this.add(displayPanel, BorderLayout.NORTH);
         //Game Menu
         menuBar.add(gameMenu);
@@ -116,17 +114,17 @@ public class Minesweeper extends JFrame{
         exitItem.addActionListener((ActionEvent actionEvent) -> System.exit(0));
 
         //Game Start
-        gamePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
         timerTime = 0;
         gameTimer = new Timer(1000, (ActionEvent actionEvent) -> incTime());
         initializeMap();
 
     }
     private boolean mapMap(Cell origin, Set<Cell> visited, int minesAdj){
+
         Cell[][] map = gameState.getMap();
-        int x = map.length - 1;
-        int y = map[0].length - 1;
+        int x = map.length;
+        int y = map[0].length;
+        /*
         int cellX = origin.getCellLocation().x;
         int cellY = origin.getCellLocation().y;
         int minesAdjacent = 0;
@@ -152,9 +150,44 @@ public class Minesweeper extends JFrame{
         if(cellX > 0 && cellY > 0)
             minesAdjacent = mapMap(map[cellY - 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         origin.setCellType(minesAdjacent == 0 ? 0 : minesAdjacent + 3);
-        return false;
+        return false;*/
+        for(int i = 0; i < x; i++){
+            for(int j = 0; j < y; j++){
+                int minesAdjacent = 0;
+                if(i > 0)
+                    if(map[i - 1][j].getCellType() > 3)
+                        minesAdjacent++;
+                if(j > 0)
+                    if(map[i][j - 1].getCellType() > 3)
+                        minesAdjacent++;
+                if(i < map.length)
+                    if(map[i + 1][j].getCellType() > 3)
+                        minesAdjacent++;
+                if(j > map[i].length)
+                    if(map[i][j + 1].getCellType() > 3)
+                        minesAdjacent++;
+                if(i > 0 && j < map[0].length)
+                    if(map[i - 1][j + 1].getCellType() > 3)
+                        minesAdjacent++;
+                if(j > 0 && i < map.length) //TODO ended here
+                    if(map[i][j].getCellType() > 3)
+                        minesAdjacent++;
+                if(i > 0)
+                    if(map[i][j].getCellType() > 3)
+                        minesAdjacent++;
+                if(i > 0)
+                    if(map[i][j].getCellType() > 3)
+                        minesAdjacent++;
+                if(i > 0)
+                    if(map[i][j].getCellType() > 3)
+                        minesAdjacent++;
+            }
+        }
     }
-    private void initializeMap(){
+    void initializeMap(){
+        JPanel gamePanel = new JPanel();
+        gamePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        gamePanel.setLayout(new BoxLayout(gamePanel, BoxLayout.Y_AXIS));
         Cell[][] map = gameState.getMap();
         mineCells = new HashSet<>();
         for(int i = 0; i < map.length; i++){
@@ -211,10 +244,15 @@ public class Minesweeper extends JFrame{
             }
             gamePanel.add(cellRow);
         }
-
-        mineLabel1.setIcon(timerIconFromInt(timerTime/100));
-        mineLabel2.setIcon(timerIconFromInt((timerTime%100)/10));
-        mineLabel3.setIcon(timerIconFromInt(timerTime%10));
+        int numMines = gameState.getMines();
+        mineLabel1.setIcon(timerIconFromInt(numMines/100));
+        mineLabel2.setIcon(timerIconFromInt((numMines%100)/10));
+        mineLabel3.setIcon(timerIconFromInt(numMines%10));
+        if(oldGamePanel != null)
+            this.remove(oldGamePanel);
+        oldGamePanel = gamePanel;
+        this.add(gamePanel, BorderLayout.CENTER);
+        this.pack();
     }
     //TODO Make a discover method
     private void checkCell(Cell cell){
