@@ -159,15 +159,14 @@ public class Minesweeper extends JFrame {
                     private boolean flagged = false;
                     private boolean skipCheck = false; // if right click
 
-                    public void mouseClicked(MouseEvent e) {
-                    }
+                    public void mouseClicked(MouseEvent e) {}
 
                     @Override
                     public void mousePressed(MouseEvent e) {
                         //If right click, cell is hidden or a flag
+                        //TODO use incMines to count the number of mines left, stop at 0 because there's no negative sign picture lol
                         if (e.getButton() == MouseEvent.BUTTON3 && (((Cell)e.getSource()).getCellType() == Cell.HIDDEN || ((Cell)e.getSource()).getCellType() == Cell.FLAG)) {
-                            flagged = !flagged;
-                            if (flagged) {
+                            if ((flagged = !flagged)) {
                                 ((Cell)e.getSource()).setIcon(FLAG);
                                 ((Cell)e.getSource()).setCellType(Cell.FLAG);
                             } else {
@@ -254,7 +253,6 @@ public class Minesweeper extends JFrame {
         for (int i = 0; i < gameState.getMines(); i++) {
             int mine = mineRandomSpread.remove((int)(Math.random() * mineRandomSpread.size()));
             Cell randCell = map[mine / map.length][mine % map.length];
-            randCell.setCellType(Cell.HIDDEN);
             randCell.setHiddenType(Cell.MINE);
             mineCells.add(randCell);
         }
