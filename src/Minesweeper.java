@@ -123,7 +123,7 @@ public class Minesweeper extends JFrame{
         initializeMap();
 
     }
-    private boolean discoverAround(Cell origin, Set<Cell> visited, int minesAdj){
+    private boolean mapMap(Cell origin, Set<Cell> visited, int minesAdj){
         Cell[][] map = gameState.getMap();
         int x = map.length - 1;
         int y = map[0].length - 1;
@@ -135,41 +135,22 @@ public class Minesweeper extends JFrame{
         }
         if(!visited.add(origin))
             return false;
-        if(minesAdj > 0)
-            return false;
         if(cellX > 0)
-            minesAdjacent = discoverAround(map[cellY][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(minesAdj > 0)
-            return false;
+            minesAdjacent = mapMap(map[cellY][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         if(cellY > 0)
-            minesAdjacent = discoverAround(map[cellY - 1][cellX], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(minesAdj > 0)
-            return false;
+            minesAdjacent = mapMap(map[cellY - 1][cellX], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         if(cellX < x)
-            minesAdjacent = discoverAround(map[cellY][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(minesAdj > 0)
-            return false;
+            minesAdjacent = mapMap(map[cellY][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         if(cellY < y)
-            minesAdjacent = discoverAround(map[cellY + 1][cellX], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(minesAdj > 0)
-            return false;
+            minesAdjacent = mapMap(map[cellY + 1][cellX], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         if(cellX < x && cellY < y)
-            minesAdjacent = discoverAround(map[cellY + 1][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(minesAdj > 0)
-            return false;
+            minesAdjacent = mapMap(map[cellY + 1][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         if(cellX > 0 && cellY < y)
-            minesAdjacent = discoverAround(map[cellY + 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(minesAdj > 0)
-            return false;
+            minesAdjacent = mapMap(map[cellY + 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         if(cellX < x && cellY > 0)
-            minesAdjacent = discoverAround(map[cellY - 1][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(minesAdj > 0)
-            return false;
+            minesAdjacent = mapMap(map[cellY - 1][cellX + 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         if(cellX > 0 && cellY > 0)
-            minesAdjacent = discoverAround(map[cellY - 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
-        if(minesAdj > 0)
-            return false;
-        origin.setIcon(adjIconFromInt(minesAdjacent));
+            minesAdjacent = mapMap(map[cellY - 1][cellX - 1], visited, minesAdjacent) ? minesAdjacent + 1 : minesAdjacent;
         origin.setCellType(minesAdjacent == 0 ? 0 : minesAdjacent + 3);
         return false;
     }
@@ -190,8 +171,10 @@ public class Minesweeper extends JFrame{
                     public void mousePressed(MouseEvent e) {
                         if(e.getButton() == MouseEvent.BUTTON3 && ((Cell)e.getSource()).getCellType() != Cell.BLANK && !(((Cell)e.getSource()).getCellType() >= Cell.ONE)) {
                             flagged = !flagged;
-                            if(flagged)
+                            if(flagged) {
                                 ((Cell)e.getSource()).setIcon(FLAG);
+                                ((Cell)e.getSource()).setCellType(Cell.FLAG);
+                            }
                             else {
                                 skipCheck = true;
                                 ((Cell)e.getSource()).setIcon(HIDDEN);
@@ -233,6 +216,7 @@ public class Minesweeper extends JFrame{
         mineLabel2.setIcon(timerIconFromInt((timerTime%100)/10));
         mineLabel3.setIcon(timerIconFromInt(timerTime%10));
     }
+    //TODO Make a discover method
     private void checkCell(Cell cell){
         if(cell.getCellType() == Cell.MINE){
             for(Cell mines : mineCells){
@@ -240,21 +224,25 @@ public class Minesweeper extends JFrame{
             }
             cell.setIcon(MINE_LOSE);
         } else if(cell.getCellType() == Cell.HIDDEN){
-            discoverAround(cell, new HashSet<>(), 0);
+            //Discover Here
         }
     }
     private void startGame(Point startCell){
         if(!gameTimer.isRunning())
             gameTimer.start();
         gameState.setGameRunning(true);
-        ArrayList<Integer> mineRandomSpread = new ArrayList<>();
-        for(int i = 0; i < gameState.getMap().length * gameState.getMap()[0].length; i++)
-            mineRandomSpread.add(i);
-        Collections.shuffle(mineRandomSpread);
-        for(int i = 0; i < gameState.getMines(); i++) {
-            int mine = mineRandomSpread.remove((int)(Math.random() * mineRandomSpread.size()));
-            gameState.getMap()[mine / gameState.getMap().length][mine % gameState.getMap().length].setCellType(Cell.MINE);
-            mineCells.add(gameState.getMap()[mine / gameState.getMap().length][mine % gameState.getMap().length]);
+        while(true) {
+            ArrayList<Integer> mineRandomSpread = new ArrayList<>();
+            for (int i = 0; i < gameState.getMap().length * gameState.getMap()[0].length; i++)
+                mineRandomSpread.add(i);
+            Collections.shuffle(mineRandomSpread);
+            for (int i = 0; i < gameState.getMines(); i++) {
+                int mine = mineRandomSpread.remove((int)(Math.random() * mineRandomSpread.size()));
+                gameState.getMap()[mine / gameState.getMap().length][mine % gameState.getMap().length].setCellType(Cell.MINE);
+                mineCells.add(gameState.getMap()[mine / gameState.getMap().length][mine % gameState.getMap().length]);
+                if (!mapMap(gameState.getMap()[startCell.x][startCell.y], new HashSet<>(), 0))
+                    return;
+            }
         }
     }
     GameState getGameState(){
