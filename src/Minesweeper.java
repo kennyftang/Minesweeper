@@ -167,10 +167,12 @@ public class Minesweeper extends JFrame {
                         //TODO use incMines to count the number of mines left, stop at 0 because there's no negative sign picture lol
                         if (e.getButton() == MouseEvent.BUTTON3 && (((Cell)e.getSource()).getCellType() == Cell.HIDDEN || ((Cell)e.getSource()).getCellType() == Cell.FLAG)) {
                             if ((flagged = !flagged)) {
+                                incMines(-1);
                                 ((Cell)e.getSource()).setIcon(FLAG);
                                 ((Cell)e.getSource()).setCellType(Cell.FLAG);
                             } else {
                                 skipCheck = true;
+                                incMines(1);
                                 ((Cell)e.getSource()).setIcon(HIDDEN);
                                 ((Cell)e.getSource()).setCellType(Cell.HIDDEN);
                             }
@@ -183,7 +185,7 @@ public class Minesweeper extends JFrame {
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         if (!gameState.isGameRunning())
-                            startGame(((Cell)e.getSource()).getCellLocation());
+                            startGame(((Cell)e.getSource()));
                         if (inCell && !flagged & !skipCheck)
                             checkCell(((Cell)e.getSource()));
                     }
@@ -232,6 +234,13 @@ public class Minesweeper extends JFrame {
                 mines.setIcon(MINE);
             }
             cell.setIcon(MINE_LOSE);
+            Cell[][] map = gameState.getMap();
+            for(Cell[] cellRow : map){
+                for(Cell loseCells : cellRow){
+                    loseCells.removeMouseListener(loseCells.getMouseListeners()[0]);
+                }
+            }
+            gameTimer.stop();
         } else if (cell.getCellType() == Cell.HIDDEN) {
             //TODO Add working discover method here
             for (Cell[] cellRow : gameState.getMap())
@@ -240,8 +249,7 @@ public class Minesweeper extends JFrame {
         }
     }
 
-    private void startGame(Point startCell) {
-        //TODO No mines within 1 radius
+    private void startGame(Cell startCell) {
         if (!gameTimer.isRunning())
             gameTimer.start();
         Cell[][] map = gameState.getMap();
@@ -249,6 +257,10 @@ public class Minesweeper extends JFrame {
         ArrayList<Integer> mineRandomSpread = new ArrayList<>();
         for (int i = 0; i < map.length * map[0].length; i++)
             mineRandomSpread.add(i);
+        for(Cell adj : startCell.getAdjacentCells(map)){
+            mineRandomSpread.remove((Integer)(adj.getCellLocation().y * map[0].length + adj.getCellLocation().x));
+        }
+        mineRandomSpread.remove((Integer)(startCell.getCellLocation().y * map[0].length + startCell.getCellLocation().x));
         Collections.shuffle(mineRandomSpread);
         for (int i = 0; i < gameState.getMines(); i++) {
             int mine = mineRandomSpread.remove((int)(Math.random() * mineRandomSpread.size()));
@@ -263,6 +275,11 @@ public class Minesweeper extends JFrame {
         return gameState;
     }
 
+    private boolean checkWin(){
+        //TODO: Implement this
+        return false;
+    }
+
     private void incTime(int amt) {
         timerTime += amt;
         timerLabel1.setIcon(timerIconFromInt(timerTime / 100));
@@ -272,6 +289,8 @@ public class Minesweeper extends JFrame {
 
     private void incMines(int amt) {
         mineCount += amt;
+        if(mineCount < 0)
+            mineCount = 0;
         mineLabel1.setIcon(timerIconFromInt(mineCount / 100));
         mineLabel2.setIcon(timerIconFromInt((mineCount % 100) / 10));
         mineLabel3.setIcon(timerIconFromInt(mineCount % 10));
