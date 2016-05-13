@@ -1,13 +1,11 @@
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Minesweeper extends JFrame {
     //Define Minesweeper Icons
@@ -229,7 +227,6 @@ public class Minesweeper extends JFrame {
     //TODO Make a discover method
     private void checkCell(Cell cell) {
         if (cell.getHiddenType() == Cell.MINE) {
-            //TODO Lose Game Implementation
             for (Cell mines : mineCells) {
                 mines.setIcon(MINE);
             }
@@ -243,12 +240,28 @@ public class Minesweeper extends JFrame {
             gameTimer.stop();
         } else if (cell.getCellType() == Cell.HIDDEN) {
             //TODO Add working discover method here
-            for (Cell[] cellRow : gameState.getMap())
-                for (Cell curCell : cellRow)
-                    revealCell(curCell); //Temporary until discover method is implemented.
+            discoverAround(cell, new HashSet<>());
+            //revealCell(cell);
+            //for (Cell[] cellRow : gameState.getMap())
+                //for (Cell curCell : cellRow)
+                    //revealCell(curCell); //Temporary until discover method is implemented.
         }
     }
+    private void discoverAround(Cell origin, Set<Cell> visited){
+        if(!visited.add(origin))
+            return;
+        revealCell(origin);
+        if(origin.getHiddenType() != Cell.BLANK && origin.getHiddenType() != Cell.MINE){
+            System.out.println("hue");
 
+            return;
+        }
+        LinkedList<Cell> adjCells = origin.getAdjacentCells(gameState.getMap());
+        for(Cell adj : adjCells){
+            discoverAround(adj, visited);
+        }
+
+    }
     private void startGame(Cell startCell) {
         if (!gameTimer.isRunning())
             gameTimer.start();
@@ -280,6 +293,11 @@ public class Minesweeper extends JFrame {
             for(Cell cell : cellRow)
                 if((cell.getCellType() == Cell.HIDDEN || cell.getCellType() == Cell.FLAG) && cell.getHiddenType() != Cell.MINE)
                     return;
+        //Uncomment when discover works!
+        //for(Cell mines : mineCells)
+            //mines.setIcon(MINE);
+        gameTimer.stop();
+
         //TODO Add win stuff
     }
 
