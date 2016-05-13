@@ -34,6 +34,7 @@ public class Minesweeper extends JFrame {
     private final ImageIcon SEG7 = new ImageIcon("img/SEG_7.png");
     private final ImageIcon SEG8 = new ImageIcon("img/SEG_8.png");
     private final ImageIcon SEG9 = new ImageIcon("img/SEG_9.png");
+    private final ImageIcon EXPLOSION = new ImageIcon("img/explosion.gif");
     private final GameState gameState;
     private final JLabel mineLabel1;
     private final JLabel mineLabel2;
@@ -224,7 +225,6 @@ public class Minesweeper extends JFrame {
         }
     }
 
-    //TODO Make a discover method
     private void checkCell(Cell cell) {
         if (cell.getHiddenType() == Cell.MINE) {
             for (Cell mines : mineCells) {
@@ -239,12 +239,7 @@ public class Minesweeper extends JFrame {
             }
             gameTimer.stop();
         } else if (cell.getCellType() == Cell.HIDDEN) {
-            //TODO Add working discover method here
             discoverAround(cell, new HashSet<>());
-            //revealCell(cell);
-            //for (Cell[] cellRow : gameState.getMap())
-                //for (Cell curCell : cellRow)
-                    //revealCell(curCell); //Temporary until discover method is implemented.
         }
     }
     private void discoverAround(Cell origin, Set<Cell> visited){
@@ -252,8 +247,6 @@ public class Minesweeper extends JFrame {
             return;
         revealCell(origin);
         if(origin.getHiddenType() != Cell.BLANK && origin.getHiddenType() != Cell.MINE){
-            System.out.println("hue");
-
             return;
         }
         LinkedList<Cell> adjCells = origin.getAdjacentCells(gameState.getMap());
@@ -293,9 +286,8 @@ public class Minesweeper extends JFrame {
             for(Cell cell : cellRow)
                 if((cell.getCellType() == Cell.HIDDEN || cell.getCellType() == Cell.FLAG) && cell.getHiddenType() != Cell.MINE)
                     return;
-        //Uncomment when discover works!
-        //for(Cell mines : mineCells)
-            //mines.setIcon(MINE);
+        for(Cell mines : mineCells)
+            mines.setIcon(MINE);
         gameTimer.stop();
 
         //TODO Add win stuff
