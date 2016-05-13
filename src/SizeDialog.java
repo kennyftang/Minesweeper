@@ -20,9 +20,9 @@ class SizeDialog extends JFrame {
         yInput.setLayout(new BoxLayout(yInput, BoxLayout.X_AXIS));
         minesInput.setLayout(new BoxLayout(minesInput, BoxLayout.X_AXIS));
         inputs.setLayout(new BoxLayout(inputs, BoxLayout.Y_AXIS));
-        xField.setMaximumSize(new Dimension(50, 20));
-        yField.setMaximumSize(new Dimension(50, 20));
-        minesField.setMaximumSize(new Dimension(50, 20));
+        xField.setPreferredSize(new Dimension(50, 20));
+        yField.setPreferredSize(new Dimension(50, 20));
+        minesField.setPreferredSize(new Dimension(50, 20));
         xInput.add(xLabel);
         xInput.add(xField);
         yInput.add(yLabel);

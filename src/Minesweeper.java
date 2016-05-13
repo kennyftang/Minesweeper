@@ -164,7 +164,6 @@ public class Minesweeper extends JFrame {
                     @Override
                     public void mousePressed(MouseEvent e) {
                         //If right click, cell is hidden or a flag
-                        //TODO use incMines to count the number of mines left, stop at 0 because there's no negative sign picture lol
                         if (e.getButton() == MouseEvent.BUTTON3 && (((Cell)e.getSource()).getCellType() == Cell.HIDDEN || ((Cell)e.getSource()).getCellType() == Cell.FLAG)) {
                             if ((flagged = !flagged)) {
                                 incMines(-1);
@@ -188,6 +187,7 @@ public class Minesweeper extends JFrame {
                             startGame(((Cell)e.getSource()));
                         if (inCell && !flagged & !skipCheck)
                             checkCell(((Cell)e.getSource()));
+                        checkWin();
                     }
 
                     @Override
@@ -245,7 +245,7 @@ public class Minesweeper extends JFrame {
             //TODO Add working discover method here
             for (Cell[] cellRow : gameState.getMap())
                 for (Cell curCell : cellRow)
-                    revealCell(curCell);
+                    revealCell(curCell); //Temporary until discover method is implemented.
         }
     }
 
@@ -264,7 +264,7 @@ public class Minesweeper extends JFrame {
         Collections.shuffle(mineRandomSpread);
         for (int i = 0; i < gameState.getMines(); i++) {
             int mine = mineRandomSpread.remove((int)(Math.random() * mineRandomSpread.size()));
-            Cell randCell = map[mine / map.length][mine % map.length];
+            Cell randCell = map[mine / map[0].length][mine % map[0].length];
             randCell.setHiddenType(Cell.MINE);
             mineCells.add(randCell);
         }
@@ -275,9 +275,12 @@ public class Minesweeper extends JFrame {
         return gameState;
     }
 
-    private boolean checkWin(){
-        //TODO: Implement this
-        return false;
+    private void checkWin(){
+        for(Cell[] cellRow : gameState.getMap())
+            for(Cell cell : cellRow)
+                if((cell.getCellType() == Cell.HIDDEN || cell.getCellType() == Cell.FLAG) && cell.getHiddenType() != Cell.MINE)
+                    return;
+        //TODO Add win stuff
     }
 
     private void incTime(int amt) {
