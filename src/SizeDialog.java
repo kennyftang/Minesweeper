@@ -29,7 +29,6 @@ class SizeDialog extends JFrame {
         yInput.add(yField);
         minesInput.add(minesLabel);
         minesInput.add(minesField);
-//        this.setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
         this.setLayout(new BorderLayout());
         inputs.add(xInput);
         inputs.add(yInput);

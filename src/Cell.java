@@ -53,7 +53,7 @@ class Cell extends JLabel {
     Point getCellLocation() {
         return cellLocation;
     }
-
+    //Returns a list of all the adjacent cells from the given map and the current cell's location
     LinkedList<Cell> getAdjacentCells(Cell[][] map) {
         LinkedList<Cell> adjCells = new LinkedList<>();
         int y = cellLocation.y;
