@@ -119,7 +119,7 @@ public class Minesweeper extends JFrame {
         client.setVisible(true);
         client.pack();
     }
-
+    //This method adds the number of adjacent mines to the cell's hidden type (not visible)
     private void mapMap() {
         Cell[][] map = gameState.getMap();
         for (Cell[] cellRow : map) {
@@ -139,7 +139,7 @@ public class Minesweeper extends JFrame {
     /*
     This method is run in order to prepare the gamePanel for a new game.
     The current gamePanel will be replaced with a new gamePanel every time it is called.
-
+    Each cell is added to the gamePanel and the mouselistener is added to every cell.
      */
     void initializeMap() {
         JPanel gamePanel = new JPanel();
@@ -217,14 +217,14 @@ public class Minesweeper extends JFrame {
         this.add(gamePanel, BorderLayout.CENTER);
         this.pack();
     }
-
+    //This method reveals a cell by changing its visible type and its icon
     private void revealCell(Cell cell) {
         if (adjIconFromInt(cell.getHiddenType()) != null) {
             cell.setIcon(adjIconFromInt(cell.getHiddenType()));
             cell.setCellType(cell.getHiddenType());
         }
     }
-
+    //This method handles a game loss or passes information to discover the cells around where the player clicked.
     private void checkCell(Cell cell) {
         if (cell.getHiddenType() == Cell.MINE) {
             for (Cell mines : mineCells) {
@@ -242,6 +242,7 @@ public class Minesweeper extends JFrame {
             discoverAround(cell, new HashSet<>());
         }
     }
+    //This method reveals every cell that should be revealed in minesweeper
     private void discoverAround(Cell origin, Set<Cell> visited){
         if(!visited.add(origin))
             return;
@@ -255,6 +256,7 @@ public class Minesweeper extends JFrame {
         }
 
     }
+    //This method generates the map by shuffling a list and removing all elements that are 1 radius from the click.
     private void startGame(Cell startCell) {
         if (!gameTimer.isRunning())
             gameTimer.start();
@@ -276,11 +278,11 @@ public class Minesweeper extends JFrame {
         }
         mapMap();
     }
-
+    //Simple getter for the gameState
     GameState getGameState() {
         return gameState;
     }
-
+    //Checks for a win condition
     private void checkWin(){
         for(Cell[] cellRow : gameState.getMap())
             for(Cell cell : cellRow)
@@ -292,14 +294,14 @@ public class Minesweeper extends JFrame {
 
         //TODO Add win stuff
     }
-
+    //Adds to the 7 seg timer for time
     private void incTime(int amt) {
         timerTime += amt;
         timerLabel1.setIcon(timerIconFromInt(timerTime / 100));
         timerLabel2.setIcon(timerIconFromInt((timerTime % 100) / 10));
         timerLabel3.setIcon(timerIconFromInt(timerTime % 10));
     }
-
+    //Adds to the 7 seg counter for mines
     private void incMines(int amt) {
         mineCount += amt;
         if(mineCount < 0)
@@ -308,7 +310,7 @@ public class Minesweeper extends JFrame {
         mineLabel2.setIcon(timerIconFromInt((mineCount % 100) / 10));
         mineLabel3.setIcon(timerIconFromInt(mineCount % 10));
     }
-
+    //Simple translator
     private Icon timerIconFromInt(int num) {
         switch (num) {
             case 0:
@@ -335,7 +337,7 @@ public class Minesweeper extends JFrame {
                 return null;
         }
     }
-
+    //Simple translator
     private Icon adjIconFromInt(int num) {
         switch (num) {
             case 0:
