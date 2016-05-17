@@ -30,6 +30,11 @@ class GameState {
         gameInstance.initializeMap();
         gameRunning = false;
     }
+    void restart(){
+        map = new Cell[map.length][map[0].length];
+        gameInstance.initializeMap();
+        gameRunning = false;
+    }
 
     Cell[][] getMap() {
         return map;

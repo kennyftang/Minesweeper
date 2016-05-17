@@ -23,6 +23,10 @@ public class Minesweeper extends JFrame {
     private final ImageIcon MINE_LOSE = new ImageIcon("img/minelose.png");
     private final ImageIcon HIDDEN = new ImageIcon("img/hidden.png");
     private final ImageIcon HIDDEN_PRESSED = new ImageIcon("img/phidden.png");
+    private final ImageIcon WINFACE = new ImageIcon("img/coolface.png");
+    private final ImageIcon LOSEFACE = new ImageIcon("img/deadface.png");
+    private final ImageIcon NEUTRALFACE = new ImageIcon("img/happyface.png");
+    private final ImageIcon NEUTRALFACE_PRESSED = new ImageIcon("img/phappyface.png");
     //Define Segment Icons
     private final ImageIcon SEG0 = new ImageIcon("img/SEG_0.png");
     private final ImageIcon SEG1 = new ImageIcon("img/SEG_1.png");
@@ -34,7 +38,6 @@ public class Minesweeper extends JFrame {
     private final ImageIcon SEG7 = new ImageIcon("img/SEG_7.png");
     private final ImageIcon SEG8 = new ImageIcon("img/SEG_8.png");
     private final ImageIcon SEG9 = new ImageIcon("img/SEG_9.png");
-    private final ImageIcon EXPLOSION = new ImageIcon("img/explosion.gif");
     private final GameState gameState;
     private final JLabel mineLabel1;
     private final JLabel mineLabel2;
@@ -42,6 +45,7 @@ public class Minesweeper extends JFrame {
     private final JLabel timerLabel1;
     private final JLabel timerLabel2;
     private final JLabel timerLabel3;
+    private final JLabel gameStatusLabel;
     //Instance Variables
     private int mineCount;
     private int timerTime;
@@ -84,6 +88,38 @@ public class Minesweeper extends JFrame {
         timeDisplayPanel.setLayout(new BoxLayout(timeDisplayPanel, BoxLayout.X_AXIS));
         displayPanel.add(mineDisplayPanel, BorderLayout.WEST);
         displayPanel.add(timeDisplayPanel, BorderLayout.EAST);
+        //Add game status button to display panel
+        gameStatusLabel = new JLabel(NEUTRALFACE);
+        gameStatusLabel.setBorder(BorderFactory.createEmptyBorder(0, 5, 0, 5));
+        gameStatusLabel.addMouseListener(new MouseListener() {
+            private boolean inButton = false;
+            @Override
+            public void mouseClicked(MouseEvent e) {}
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                gameStatusLabel.setIcon(NEUTRALFACE_PRESSED);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                gameStatusLabel.setIcon(NEUTRALFACE);
+                if(!inButton)
+                    return;
+                gameState.restart();
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                inButton = true;
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                inButton = false;
+            }
+        });
+        displayPanel.add(gameStatusLabel, BorderLayout.CENTER);
         //Add display and game to GUI
         this.setLayout(new BorderLayout());
         this.setJMenuBar(menuBar);
@@ -157,13 +193,15 @@ public class Minesweeper extends JFrame {
                     private boolean inCell = false;
                     private boolean flagged = false;
                     private boolean skipCheck = false; // if right click
-
                     public void mouseClicked(MouseEvent e) {}
 
                     @Override
                     public void mousePressed(MouseEvent e) {
+                        Cell cell = ((Cell)e.getSource());
                         //If right click, cell is hidden or a flag
-                        if (e.getButton() == MouseEvent.BUTTON3 && (((Cell)e.getSource()).getCellType() == Cell.HIDDEN || ((Cell)e.getSource()).getCellType() == Cell.FLAG)) {
+                        if(gameStatusLabel.getIcon() == WINFACE || gameStatusLabel.getIcon() == LOSEFACE)
+                            return;
+                        if (e.getButton() == MouseEvent.BUTTON3 && cell.getCellType() == Cell.HIDDEN || cell.getCellType() == Cell.FLAG) {
                             if ((flagged = !flagged)) {
                                 incMines(-1);
                                 ((Cell)e.getSource()).setIcon(FLAG);
@@ -171,21 +209,26 @@ public class Minesweeper extends JFrame {
                             } else {
                                 skipCheck = true;
                                 incMines(1);
-                                ((Cell)e.getSource()).setIcon(HIDDEN);
-                                ((Cell)e.getSource()).setCellType(Cell.HIDDEN);
+                                cell.setIcon(HIDDEN);
+                                cell.setCellType(Cell.HIDDEN);
                             }
-                        } else if (!flagged && ((Cell)e.getSource()).getCellType() == Cell.HIDDEN) {
+                        } else if (!flagged && cell.getCellType() == Cell.HIDDEN) {
                             skipCheck = false;
-                            ((Cell)e.getSource()).setIcon(HIDDEN_PRESSED);
+                            cell.setIcon(HIDDEN_PRESSED);
                         }
                     }
 
                     @Override
                     public void mouseReleased(MouseEvent e) {
+                        Cell cell = ((Cell)e.getSource());
+                        if(!inCell && cell.getCellType() == Cell.HIDDEN) {
+                            cell.setIcon(HIDDEN);
+                            return;
+                        }
                         if (!gameState.isGameRunning())
-                            startGame(((Cell)e.getSource()));
+                            startGame(cell);
                         if (inCell && !flagged & !skipCheck)
-                            checkCell(((Cell)e.getSource()));
+                            checkCell(cell);
                         checkWin();
                     }
 
@@ -238,6 +281,7 @@ public class Minesweeper extends JFrame {
                 }
             }
             gameTimer.stop();
+            gameStatusLabel.setIcon(LOSEFACE);
         } else if (cell.getCellType() == Cell.HIDDEN) {
             discoverAround(cell, new HashSet<>());
         }
@@ -289,9 +333,11 @@ public class Minesweeper extends JFrame {
                 if((cell.getCellType() == Cell.HIDDEN || cell.getCellType() == Cell.FLAG) && cell.getHiddenType() != Cell.MINE)
                     return;
         for(Cell mines : mineCells)
-            mines.setIcon(MINE);
+            mines.setIcon(FLAG);
+        mineCount = 0;
+        incMines(0);
         gameTimer.stop();
-
+        gameStatusLabel.setIcon(WINFACE);
         //TODO Add win stuff
     }
     //Adds to the 7 seg timer for time
