@@ -25,7 +25,7 @@ public class Minesweeper extends JFrame {
     private final ImageIcon HIDDEN_PRESSED = new ImageIcon("img/phidden.png");
     private final ImageIcon WINFACE = new ImageIcon("img/coolface.png");
     private final ImageIcon LOSEFACE = new ImageIcon("img/deadface.png");
-    private final ImageIcon NEUTRALFACE = new ImageIcon("img/happyface.png");
+    final ImageIcon NEUTRALFACE = new ImageIcon("img/happyface.png");
     private final ImageIcon NEUTRALFACE_PRESSED = new ImageIcon("img/phappyface.png");
     //Define Segment Icons
     private final ImageIcon SEG0 = new ImageIcon("img/SEG_0.png");
@@ -139,7 +139,6 @@ public class Minesweeper extends JFrame {
             difficultyDialog.setVisible(true);
         });
         exitItem.addActionListener((ActionEvent actionEvent) -> System.exit(0));
-
         //Game Start
         timerTime = 0;
         gameTimer = new Timer(1000, (ActionEvent actionEvent) -> incTime(1));
@@ -201,7 +200,7 @@ public class Minesweeper extends JFrame {
                         //If right click, cell is hidden or a flag
                         if(gameStatusLabel.getIcon() == WINFACE || gameStatusLabel.getIcon() == LOSEFACE)
                             return;
-                        if (e.getButton() == MouseEvent.BUTTON3 && cell.getCellType() == Cell.HIDDEN || cell.getCellType() == Cell.FLAG) {
+                        if (e.getButton() == MouseEvent.BUTTON3 && (cell.getCellType() == Cell.HIDDEN || cell.getCellType() == Cell.FLAG)) {
                             if ((flagged = !flagged)) {
                                 incMines(-1);
                                 ((Cell)e.getSource()).setIcon(FLAG);
@@ -252,6 +251,7 @@ public class Minesweeper extends JFrame {
             }
             gamePanel.add(cellRow);
         }
+        gameStatusLabel.setIcon(NEUTRALFACE);
         mineCount = gameState.getMines();
         incMines(0);
         if (oldGamePanel != null)
@@ -338,7 +338,6 @@ public class Minesweeper extends JFrame {
         incMines(0);
         gameTimer.stop();
         gameStatusLabel.setIcon(WINFACE);
-        //TODO Add win stuff
     }
     //Adds to the 7 seg timer for time
     private void incTime(int amt) {
