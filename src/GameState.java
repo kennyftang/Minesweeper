@@ -1,9 +1,9 @@
 class GameState {
 
+    private final Minesweeper gameInstance;
     private Cell[][] map;
     private int mines;
     private boolean gameRunning;
-    private final Minesweeper gameInstance;
 
     GameState(Minesweeper gameInstance) {
         map = new Cell[8][8];
@@ -30,7 +30,8 @@ class GameState {
         gameInstance.initializeMap();
         gameRunning = false;
     }
-    void restart(){
+
+    void restart() {
         map = new Cell[map.length][map[0].length];
         gameInstance.initializeMap();
         gameRunning = false;
